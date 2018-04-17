@@ -1,4 +1,4 @@
-package cl.magnet.volleyexample;
+package com.example.e440.functional_navdrawer;
 
 import com.android.volley.NetworkResponse;
 import com.android.volley.ParseError;

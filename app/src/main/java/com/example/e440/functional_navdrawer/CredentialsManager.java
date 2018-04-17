@@ -1,6 +1,5 @@
-package com.example.e440.myapplication;
+package com.example.e440.functional_navdrawer;
 
-import android.content.ContentProvider;
 import android.content.Context;
 import android.content.SharedPreferences;
 
@@ -9,10 +8,22 @@ import android.content.SharedPreferences;
  */
 
 public class CredentialsManager {
+    static CredentialsManager credentialsManager;
     static String preferencesFileName = "Credentials";
     public SharedPreferences preferences;
     public CredentialsManager(Context context){
         this.preferences = context.getSharedPreferences(preferencesFileName, Context.MODE_PRIVATE);
+    }
+
+    static synchronized CredentialsManager getInstance(Context context){
+
+
+        if (credentialsManager==null){
+
+            credentialsManager =new CredentialsManager(context);
+        }
+        return credentialsManager;
+
     }
 
 
@@ -29,7 +40,19 @@ public class CredentialsManager {
 
 
     }
+    String getToken(){
 
+        String token = this.preferences.getString("token", null);
+        return token;
+
+    }
+
+    void saveToken(String token){
+
+        SharedPreferences.Editor editor = preferences.edit();
+        editor.putString("token", token);
+
+    }
 
     void saveCredentials(String user_name, String user_password){
 

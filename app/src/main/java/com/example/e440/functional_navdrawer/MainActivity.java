@@ -1,6 +1,9 @@
 package com.example.e440.functional_navdrawer;
 
+import android.app.Activity;
 import android.arch.persistence.room.Room;
+import android.content.Context;
+import android.content.Intent;
 import android.support.design.widget.NavigationView;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
@@ -11,15 +14,25 @@ import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
+import android.widget.Toast;
+
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 
 public class MainActivity extends AppCompatActivity {
     private DrawerLayout mDrawerLayout;
-
+    private NetworkManager networkManager;
+    private CredentialsManager credentialsManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        networkManager = NetworkManager.getInstance(this);
         initializeDatabase();
         Toolbar toolbar = findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
@@ -57,12 +70,57 @@ public class MainActivity extends AppCompatActivity {
                         return true;
                     }
                 });
+        credentialsManager=CredentialsManager.getInstance(this);
+
+
+
+        if(credentialsManager.getToken()==null){
+
+            launchLogin();
+        }
 
 
 
 
 
     }
+
+    public void launchLogin(){
+
+        Intent intent = new Intent(this,Login.class);
+
+        startActivityForResult(intent,1);
+
+    }
+
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        Context context = getApplicationContext();
+        setContentView(R.layout.activity_main);
+
+        if (requestCode == 1) {  //is from login
+            if(resultCode == Activity.RESULT_OK){
+
+                CharSequence text = "Logueado con éxito";
+                int duration = Toast.LENGTH_SHORT;
+
+                Toast toast = Toast.makeText(context, text, duration);
+                toast.show();
+
+                getForms();
+
+            }
+            if (resultCode == Activity.RESULT_CANCELED) {
+                finish();
+            }
+        }
+
+
+
+
+    }
+
 
 
     @Override
@@ -81,4 +139,38 @@ public class MainActivity extends AppCompatActivity {
                 FormDatabase.class, DatabaseManager.DATABASE_NAME).fallbackToDestructiveMigration()
                 .build();
     }
+
+
+    private void getForms(){
+        networkManager.getForms(new Response.Listener<JSONObject>() {
+
+            @Override
+            public void onResponse(JSONObject response) {
+
+                System.out.println(response);
+
+                try {
+                    JSONArray resp = response.getJSONArray("0");
+                    for(int i = 0 ; i < resp.length() ; i++){
+                        JSONObject jo = resp.getJSONObject(i);
+
+                        System.out.println(jo.toString());
+                    }
+                }
+                catch(JSONException e) {
+
+                    System.out.println(e.getMessage());
+                }
+
+            }
+        }, new Response.ErrorListener() {
+
+            @Override
+            public void onErrorResponse(VolleyError error) {
+                // TODO: Handle error
+                System.out.println(error);
+            }
+        });
+    }
+
 }

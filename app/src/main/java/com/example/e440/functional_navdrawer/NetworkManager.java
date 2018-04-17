@@ -1,8 +1,7 @@
-package cl.magnet.volleyexample;
+package com.example.e440.functional_navdrawer;
 
 import android.content.Context;
-import android.graphics.Bitmap;
-import android.util.LruCache;
+import android.net.wifi.hotspot2.pps.Credential;
 
 import com.android.volley.AuthFailureError;
 import com.android.volley.NetworkResponse;
@@ -70,6 +69,7 @@ public class NetworkManager {
 
                         JSONObject headers = response.optJSONObject("headers");
                         token = headers.optString("Authorization", "");
+                        CredentialsManager.getInstance(null).saveToken(token);
                         responseListener.onResponse(response);
                     }
                 }, errorListener){

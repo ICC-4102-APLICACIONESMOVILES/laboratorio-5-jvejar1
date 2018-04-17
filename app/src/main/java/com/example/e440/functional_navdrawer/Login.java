@@ -1,9 +1,8 @@
-package com.example.e440.myapplication;
+package com.example.e440.functional_navdrawer;
 
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -13,29 +12,24 @@ import android.view.View;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.volley.Response;
+import com.android.volley.VolleyError;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Login extends AppCompatActivity {
-
+    NetworkManager networkManager;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_login);
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
-
+        setContentView(R.layout.login_layout);
 
         Intent intent = getIntent();
-
+        networkManager= NetworkManager.getInstance(this);
     }
 
     public void returnToMain(){
@@ -47,7 +41,26 @@ public class Login extends AppCompatActivity {
 
 
     public void loginButtonClick(View view){
-        Context context = getApplicationContext();
+
+        try {
+            networkManager.login("ignacio@magnet.cl", "usuarioprueba", new Response.Listener<JSONObject>() {
+
+                @Override
+                public void onResponse(JSONObject response) {
+                    returnToMain();
+                }
+            }, new Response.ErrorListener() {
+
+                @Override
+                public void onErrorResponse(VolleyError error) {
+                    // TODO: Handle error
+                    System.out.println(error);
+                }
+            });
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+      /*  Context context = getApplicationContext();
         //Get the user and password to check if they are valids
 
         EditText userEditText = (EditText) findViewById(R.id.userEditText);
@@ -75,7 +88,7 @@ public class Login extends AppCompatActivity {
             Toast toast = Toast.makeText(context,"Campos invalidos",duration);
             toast.show();
         }
-
+*/
 
         //
 
