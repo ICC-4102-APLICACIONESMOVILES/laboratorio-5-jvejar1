@@ -60,6 +60,16 @@ public class Form {
     private String formDateText;
     private String formCategory;
 
+    public int getTotalFields() {
+        return totalFields;
+    }
+
+    public void setTotalFields(int totalFields) {
+        this.totalFields = totalFields;
+    }
+
+    private int totalFields;
+
     public Form() {
 
     }

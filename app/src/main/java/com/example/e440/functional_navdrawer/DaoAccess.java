@@ -17,19 +17,27 @@ public interface DaoAccess {
 
     @Insert
     void insertOnlySingleForm (Form form);
+
     @Insert
     void insertMultipleForms (List<Form> formList);
+
     @Query("SELECT * FROM Form WHERE formId = :formId")
     Form fetchOneFormbyFormId (int formId);
 
     @Query("SELECT * FROM Form")
     Form[] fetchAllForms();
 
+    @Query("DELETE from Form")
+    void deleteAllForms ();
+
+
 
     @Update
     void updateForm (Form form);
     @Delete
     void deleteForm (Form form);
+
+
 
 
 }

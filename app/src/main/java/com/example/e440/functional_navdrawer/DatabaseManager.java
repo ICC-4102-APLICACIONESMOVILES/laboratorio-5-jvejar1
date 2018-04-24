@@ -7,7 +7,6 @@ import android.arch.persistence.room.Room;
  */
 
 public class DatabaseManager {
-
     static final String DATABASE_NAME = "Form_db";
     static FormDatabase formDatabase;
 

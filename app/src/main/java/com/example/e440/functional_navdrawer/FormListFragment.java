@@ -20,12 +20,15 @@ import java.util.List;
 
 public class FormListFragment extends Fragment {
     Form[] allForms;
+
+    MainActivity mainActivity;
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         final View rootView = inflater.inflate(R.layout.view_forms, container, false);
 
 
+        mainActivity=(MainActivity)getActivity();
         Thread thread = new Thread(){
             public void run(){
 
@@ -60,9 +63,9 @@ public class FormListFragment extends Fragment {
         formsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             public void onItemClick(AdapterView<?> parent, View view,int position, long id) {
                 // When clicked, show a toast with the TextView text
-                int selectedFormId = (int)formsListView.getItemIdAtPosition(position);
+                Form selectedForm= (Form)formsListView.getItemAtPosition(position);
                 int a  = 5;
-
+                mainActivity.displayForm(selectedForm);
                  }
         });
         return rootView;

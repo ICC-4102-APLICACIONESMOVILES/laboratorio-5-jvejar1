@@ -12,6 +12,7 @@ import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.MenuItem;
 import android.support.v7.widget.Toolbar;
 import android.widget.Toast;
@@ -72,7 +73,26 @@ public class MainActivity extends AppCompatActivity {
                 });
         credentialsManager=CredentialsManager.getInstance(this);
 
+        Thread thread = new Thread(){
+            public void run(){
 
+                DatabaseManager.formDatabase.daoAccess () .deleteAllForms();
+
+                Form[] allForms =DatabaseManager.formDatabase.daoAccess().fetchAllForms();
+                int a =5;
+
+            }
+        };
+
+        thread.start();
+        try{
+            thread.join();
+        }
+
+        catch (InterruptedException e){
+            System.out.println(e.getMessage().toString());
+
+        }
 
         if(credentialsManager.getToken()==null){
 
@@ -93,35 +113,40 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        super.onActivityResult(requestCode, resultCode, data);
-        Context context = getApplicationContext();
-        setContentView(R.layout.activity_main);
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+
 
         if (requestCode == 1) {  //is from login
-            if(resultCode == Activity.RESULT_OK){
-
                 CharSequence text = "Logueado con éxito";
                 int duration = Toast.LENGTH_SHORT;
 
-                Toast toast = Toast.makeText(context, text, duration);
+                Toast toast = Toast.makeText(getApplicationContext(), text, duration);
                 toast.show();
 
                 getForms();
 
-            }
-            if (resultCode == Activity.RESULT_CANCELED) {
-                finish();
-            }
+
         }
+
 
 
 
 
     }
 
+    void displayForm(Form f){
+        FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
+        ShowFormFragment sff = new ShowFormFragment();
+        Bundle args = new Bundle();
+        args.putString("name",f.getFormName());
+        args.putInt("fields",f.getTotalFields());
+        args.putString("created_at",f.getFormDateText());
+        sff.setArguments(args);
+        ft.replace(R.id.fragment_space, sff);
+        ft.commit();
 
+
+    }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
@@ -153,7 +178,21 @@ public class MainActivity extends AppCompatActivity {
                     JSONArray resp = response.getJSONArray("0");
                     for(int i = 0 ; i < resp.length() ; i++){
                         JSONObject jo = resp.getJSONObject(i);
+                        final Form f=new Form();
+                        f.setFormName(jo.optString("name"));
+                        f.setFormDateText(jo.optString("created_at"));
+                        f.setTotalFields(jo.optJSONArray("fieldsets").length());
 
+                        new Thread(new Runnable() {
+                            @Override
+                            public void run() {
+                                DatabaseManager.formDatabase.daoAccess () . insertOnlySingleForm (f);
+
+                                Form[] allForms =DatabaseManager.formDatabase.daoAccess().fetchAllForms();
+                                int a =5;
+
+                            }
+                        }) .start();
                         System.out.println(jo.toString());
                     }
                 }
